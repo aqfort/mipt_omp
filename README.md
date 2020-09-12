@@ -1,0 +1,2 @@
+# mipt.omp
+OpenMP
