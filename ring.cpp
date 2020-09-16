@@ -1,9 +1,6 @@
 #include <iostream>
-#include <iomanip>
-#include <string>
 #include <sstream>
-#include <stdexcept>
-#include <stdio.h>
+#include <string>
 #include <omp.h>
 
 using namespace std;
@@ -13,35 +10,37 @@ int parse_int_from_string(const string& input);
 int main()
 {
     int i;
+    int my_id;
     int max_threads;
-    int N;
-    double sum;
+    int threads;
+    string data = "data:";
     string string_input;
     bool done;
 
     max_threads = omp_get_max_threads();
 
-    cout << "number of threads is in range [1, max]" << endl 
-        << "let\'s use max number of threads -- " << max_threads << endl << endl;
-
-    omp_set_num_threads(max_threads);
-
-    // cin >> N;
-
     done = false;
 
     while (!done)
     {
-        cout << "enter N -- number of elements in sequence" << endl << 
-            "(harmonic series)" << endl;
+        cout << "enter number of threads" << endl << 
+            "it can be in range [1; " << max_threads << "]" << endl;
 
         getline(cin, string_input);
 
         try
         {
-            N = parse_int_from_string(string_input);
+            threads = parse_int_from_string(string_input);
 
-            done = true;
+            if (1 <= threads && threads <= max_threads)
+            {
+                done = true;
+            }
+            else
+            {
+                cerr << "mind proper range" << endl;
+            }
+            
         }
         catch(const std::exception& e)
         {
@@ -50,23 +49,20 @@ int main()
         }
     }
 
-    sum = 0;
+    omp_set_num_threads(threads);
 
     #pragma omp parallel for    \
-    private(i)                  \
-    schedule(guided)            \
-    reduction(+:sum)
-    for (i = 1; i <= N; i++)
+    shared(data)                \
+    private(i, my_id)           \
+    ordered
+    for (i = 0; i < threads; i++)
     {
-        sum += 1.0 / i;
+        my_id = omp_get_thread_num();
+        #pragma omp ordered
+        data += " " + to_string(my_id);
     }
 
-    cout << endl;
-    
-    cout << "sum of " << N << " elements of harmonic series" << endl << 
-        "sum = " << fixed << setprecision(15) << sum << endl;
-
-    cout.unsetf(ios::fixed | ios::scientific);
+    cout << data << endl;
 
     return 0;
 }
