@@ -43,7 +43,7 @@ int main()
 
             done = true;
         }
-        catch(const std::exception& e)
+        catch(const exception& e)
         {
             cerr << "enter number in proper format" << endl << 
                 e.what() << endl;
