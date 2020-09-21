@@ -17,11 +17,13 @@ void print_matrix(const int& size, int** matrix);
 
 default_random_engine generator;
 uniform_int_distribution<int> distribution(-100, 100);
+// auto dice = bind(distribution, generator);
 
 int main()
 {
     int i, j, k;
     int size;
+    double time_1, time_2;
 
     cout << "number of threads is in range [1, " << omp_get_max_threads() << "]" << endl << 
         "let\'s use max number of threads" << endl << endl;
@@ -53,27 +55,71 @@ int main()
     init_matrix(size, A);
     init_matrix(size, B);
 
-    print_matrix(size, A);
-    cout << endl;
-    print_matrix(size, B);
+    {
+        cout << "let\'s look at A and B:" << endl;
+        print_matrix(size, A);
+        cout << endl;
+        print_matrix(size, B);
+    }
+
+    cout << endl << "algorithm" << endl;
 
 
 
 
-    // #pragma omp parallel for    \
-    // shared(A, B, C)             \
-    // private(i, j, k)
-    // for (i = 0; i < size; i++)
-    // {
-    //     for (j = 0; j < size; j++)
-    //     {
-    //         C[i][j] = 0;
-    //         for (k = 0; k < size; k++)
-    //         {
-    //             C[i][j] += A[i][k] * B[k][j];
-    //         }
-    //     }
-    // }
+
+    time_1 = omp_get_wtime();
+
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            C[i][j] = 0;
+            for (k = 0; k < size; k++)
+            {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    time_2 = omp_get_wtime();
+
+    cout << "dumb algorithm spent " << fixed << setprecision(10) << time_2 - time_1 << endl;
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
+
+    cout << endl << "result:" << endl;
+    print_matrix(size, C);
+
+
+
+
+
+    time_1 = omp_get_wtime();
+
+    #pragma omp parallel for    \
+    shared(A, B, C)             \
+    private(i, j, k)
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            C[i][j] = 0;
+            for (k = 0; k < size; k++)
+            {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    time_2 = omp_get_wtime();
+
+    cout << "parallel algorithm spent " << fixed << setprecision(10) << time_2 - time_1 << endl;
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
+
+    cout << endl << "result:" << endl;
+    print_matrix(size, C);
 
 
 
@@ -164,11 +210,11 @@ int parse_int_from_string(const string& string_input)
 
 void init_matrix(const int& size, int** A)
 {
-    // auto dice = bind(distribution, generator);
+    int i, j;
 
-    for (int i = 0; i < size; i++)
+    for (i = 0; i < size; i++)
     {
-        for (int j = 0; j < size; j++)
+        for (j = 0; j < size; j++)
         {
             A[i][j] = distribution(generator);
 
@@ -179,9 +225,11 @@ void init_matrix(const int& size, int** A)
 
 void print_matrix(const int& size, int** matrix)
 {
-    for (int i = 0; i < size; i++)
+    int i, j;
+
+    for (i = 0; i < size; i++)
     {
-        for (int j = 0; j < size; j++)
+        for (j = 0; j < size; j++)
         {
             cout << setw(5) << matrix[i][j] << ' ';
         }
