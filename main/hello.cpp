@@ -11,7 +11,7 @@ int main()
 
     threads = omp_get_max_threads();
     cout << "max number of threads is " << threads << 
-        ", let\'s use it" << endl << endl;
+        ", let\'s use it\n\n";
 
     omp_set_num_threads(threads);
 
