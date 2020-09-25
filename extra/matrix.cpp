@@ -115,20 +115,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    reset_matrix(size, C);
+    // reset_matrix(size, C);
 
-    time_1 = omp_get_wtime();
-    algorithm_1(size, A, B, C);
-    time_2 = omp_get_wtime();
+    // time_1 = omp_get_wtime();
+    // algorithm_1(size, A, B, C);
+    // time_2 = omp_get_wtime();
 
     // cout << "\n\nresult:\n\n";
 
     // print_matrix(size, C);
 
     // cout << "dumb algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
-    cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    cout.unsetf(ios::fixed | ios::scientific);
-    cout.precision(6);
+    // // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
+    // cout.unsetf(ios::fixed | ios::scientific);
+    // cout.precision(6);
 
 
 
@@ -211,20 +211,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_5(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_5(size, A, B, C);
+    time_2 = omp_get_wtime();
     
-    // // cout << "\n\nresult:\n\n";
+    // cout << "\n\nresult:\n\n";
 
-    // // print_matrix(size, C);
+    // print_matrix(size, C);
 
-    // // cout << "strassen algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    cout << "strassen algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
     // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -235,20 +235,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_6(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_6(size, A, B, C);
+    time_2 = omp_get_wtime();
 
-    // // cout << "\n\nresult:\n\n";
+    // cout << "\n\nresult:\n\n";
 
-    // // print_matrix(size, C);
+    // print_matrix(size, C);
 
-    // // cout << "strassen parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    cout << "strassen parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
     // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -825,7 +825,7 @@ void del_mem(const int& size, int** A)
 
 void algorithm_6(const int& size, int** A, int** B, int** C)
 {
-    int i, j;
+    int i, j, k;
 
     int size_optimal = get_2_n_size_parallel(size);
 
@@ -840,7 +840,7 @@ void algorithm_6(const int& size, int** A, int** B, int** C)
 
     // #pragma omp parallel for            \
     // shared(A, B, A_new, B_new)
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for default(shared) collapse(2)
     for (i = 0; i < size; i++)
     {
         for (j = 0; j < size; j++)
@@ -852,7 +852,7 @@ void algorithm_6(const int& size, int** A, int** B, int** C)
 
     // #pragma omp parallel for            \
     // shared(A_new, B_new, C_new)
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for default(shared) collapse(2)
     for (i = 0; i < size_optimal; i++)
     {
         for (j = size; j < size_optimal; j++)
@@ -865,7 +865,7 @@ void algorithm_6(const int& size, int** A, int** B, int** C)
 
     // #pragma omp parallel for            \
     // shared(A_new, B_new, C_new)
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for default(shared) collapse(2)
     for (i = size; i < size_optimal; i++)
     {
         for (j = 0; j < size; j++)
@@ -878,7 +878,202 @@ void algorithm_6(const int& size, int** A, int** B, int** C)
 
 
 
-    mul_matrix_parallel(size_optimal, A_new, B_new, C_new);
+
+    int size_half = size_optimal / 2;
+
+    int** A_11;
+    int** A_12;
+    int** A_21;
+    int** A_22;
+
+    int** B_11;
+    int** B_12;
+    int** B_21;
+    int** B_22;
+
+    int** C_11;
+    int** C_12;
+    int** C_21;
+    int** C_22;
+
+    {
+        {
+            A_11 = get_mem_parallel(size_half);
+            A_12 = get_mem_parallel(size_half);
+            A_21 = get_mem_parallel(size_half);
+            A_22 = get_mem_parallel(size_half);
+        }
+
+        {
+            B_11 = get_mem_parallel(size_half);
+            B_12 = get_mem_parallel(size_half);
+            B_21 = get_mem_parallel(size_half);
+            B_22 = get_mem_parallel(size_half);
+        }
+
+        {
+            C_11 = get_mem_parallel(size_half);
+            C_12 = get_mem_parallel(size_half);
+            C_21 = get_mem_parallel(size_half);
+            C_22 = get_mem_parallel(size_half);
+        }
+    }
+
+    #pragma omp parallel for default(shared) collapse(2)
+    for (i = 0; i < size_half; i++)
+    {
+        for (j = 0; j < size_half; j++)
+        {
+            A_11[i][j] = A_new[i][j];
+            A_12[i][j] = A_new[i][j + size_half];
+            A_21[i][j] = A_new[i + size_half][j];
+            A_22[i][j] = A_new[i + size_half][j + size_half];
+
+            B_11[i][j] = B_new[i][j];
+            B_12[i][j] = B_new[i][j + size_half];
+            B_21[i][j] = B_new[i + size_half][j];
+            B_22[i][j] = B_new[i + size_half][j + size_half];
+        }
+    }
+
+    int** P_1;
+    int** P_2;
+    int** P_3;
+    int** P_4;
+    int** P_5;
+    int** P_6;
+    int** P_7;
+
+    {
+        P_1 = get_mem_parallel(size_half);
+        P_2 = get_mem_parallel(size_half);
+        P_3 = get_mem_parallel(size_half);
+        P_4 = get_mem_parallel(size_half);
+        P_5 = get_mem_parallel(size_half);
+        P_6 = get_mem_parallel(size_half);
+        P_7 = get_mem_parallel(size_half);
+    }
+
+    int** temp_1;
+    int** temp_2;
+
+    temp_1 = get_mem_parallel(size_half);
+    temp_2 = get_mem_parallel(size_half);
+
+
+    #pragma omp parallel default(shared)
+    #pragma omp single
+    {
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, A_11, A_22, temp_1);
+            sum_matrix_parallel(size_half, B_11, B_22, temp_2);
+            mul_matrix_parallel(size_half, temp_1, temp_2, P_1);
+        }
+
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, A_21, A_22, temp_1);
+            mul_matrix_parallel(size_half, temp_1, B_11, P_2);
+        }
+
+        #pragma omp task
+        {
+            sub_matrix_parallel(size_half, B_12, B_22, temp_1);
+            mul_matrix_parallel(size_half, A_11, temp_1, P_3);
+        }
+
+        #pragma omp task
+        {
+            sub_matrix_parallel(size_half, B_21, B_11, temp_1);
+            mul_matrix_parallel(size_half, A_22, temp_1, P_4);
+        }
+
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, A_11, A_12, temp_1);
+            mul_matrix_parallel(size_half, temp_1, B_22, P_5);
+        }
+
+        #pragma omp task
+        {
+            sub_matrix_parallel(size_half, A_21, A_11, temp_1);
+            sum_matrix_parallel(size_half, B_11, B_12, temp_2);
+            mul_matrix_parallel(size_half, temp_1, temp_2, P_6);
+        }
+
+        #pragma omp task
+        {
+            sub_matrix_parallel(size_half, A_12, A_22, temp_1);
+            sum_matrix_parallel(size_half, B_21, B_22, temp_2);
+            mul_matrix_parallel(size_half, temp_1, temp_2, P_7);
+        }
+
+        #pragma omp taskwait
+
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, P_1, P_4, temp_1);
+            sub_matrix_parallel(size_half, temp_1, P_5, temp_2);
+            sum_matrix_parallel(size_half, temp_2, P_7, C_11);
+        }
+
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, P_3, P_5, C_12);
+        }
+
+        #pragma omp task
+        {
+            sum_matrix_parallel(size_half, P_2, P_4, C_21);
+        }
+
+        #pragma omp task
+        {
+            sub_matrix_parallel(size_half, P_1, P_2, temp_1);
+            sum_matrix_parallel(size_half, temp_1, P_3, temp_2);
+            sum_matrix_parallel(size_half, temp_2, P_6, C_22);
+        }
+    }
+
+
+    del_mem_parallel(size_half, temp_1);
+    del_mem_parallel(size_half, temp_2);
+
+    {
+        del_mem_parallel(size_half, P_1);
+        del_mem_parallel(size_half, P_2);
+        del_mem_parallel(size_half, P_3);
+        del_mem_parallel(size_half, P_4);
+        del_mem_parallel(size_half, P_5);
+        del_mem_parallel(size_half, P_6);
+        del_mem_parallel(size_half, P_7);
+    }
+
+    joint_parallel(size_half, C_new, C_11, C_12, C_21, C_22);
+
+    {
+        {
+            del_mem_parallel(size_half, A_11);
+            del_mem_parallel(size_half, A_12);
+            del_mem_parallel(size_half, A_21);
+            del_mem_parallel(size_half, A_22);
+        }
+
+        {
+            del_mem_parallel(size_half, B_11);
+            del_mem_parallel(size_half, B_12);
+            del_mem_parallel(size_half, B_21);
+            del_mem_parallel(size_half, B_22);
+        }
+
+        {
+            del_mem_parallel(size_half, C_11);
+            del_mem_parallel(size_half, C_12);
+            del_mem_parallel(size_half, C_21);
+            del_mem_parallel(size_half, C_22);
+        }
+    }
 
 
 
@@ -886,7 +1081,7 @@ void algorithm_6(const int& size, int** A, int** B, int** C)
     // shared(C, C_new)            \
     // private(size, i, j)         \
     // schedule(guided)
-    #pragma omp parallel for collapse(2)
+    #pragma omp parallel for default(shared) collapse(2)
     for (i = 0; i < size; i++)
     {
         for (j = 0; j < size; j++)
@@ -914,15 +1109,66 @@ int get_2_n_size_parallel(int size)
     return result;
 }
 
+void split_parallel(const int& size_half, int** A, int** A_11, int** A_12, int** A_21, int** A_22)
+{
+    int i, j;
+
+    for (i = 0; i < size_half; i++)
+    {
+        for (j = 0; j < size_half; j++)
+        {
+            A_11[i][j] = A[i][j];
+            A_12[i][j] = A[i][j + size_half];
+            A_21[i][j] = A[i + size_half][j];
+            A_22[i][j] = A[i + size_half][j + size_half];
+        }
+    }
+}
+
+void joint_parallel(const int& size_half, int** A, int** A_11, int** A_12, int** A_21, int** A_22)
+{
+    int i, j;
+
+    for (i = 0; i < size_half; i++)
+    {
+        for (j = 0; j < size_half; j++)
+        {
+            A[i][j] = A_11[i][j];
+            A[i][j + size_half] = A_12[i][j];
+            A[i + size_half][j] = A_21[i][j];
+            A[i + size_half][j + size_half] = A_22[i][j];
+        }
+    }
+}
+
+int** get_mem_parallel(const int& size)
+{
+    int** A = new int*[size];
+    int i;
+
+    for (i = 0; i < size; i++)
+    {
+        A[i] = new int[size];
+    }
+
+    return A;
+}
+
+void del_mem_parallel(const int& size, int** A)
+{
+    int i;
+
+    for (i = 0; i < size; i++)
+    {
+        delete[] A[i];
+    }
+    delete[] A;
+}
+
 void sum_matrix_parallel(const int& size, int** A, int** B, int** C)
 {
     int i, j;
 
-    // #pragma omp parallel for    \
-    // shared(A, B, C)             \
-    // private(size, i, j)         \
-    // schedule(guided)
-    #pragma omp parallel for collapse(2)
     for (i = 0; i < size; i++)
     {
         for (j = 0; j < size; j++)
@@ -936,11 +1182,6 @@ void sub_matrix_parallel(const int& size, int** A, int** B, int** C)
 {
     int i, j;
 
-    // #pragma omp parallel for    \
-    // shared(A, B, C)             \
-    // private(size, i, j)         \
-    // schedule(guided)
-    #pragma omp parallel for collapse(2)
     for (i = 0; i < size; i++)
     {
         for (j = 0; j < size; j++)
@@ -978,9 +1219,7 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
         int** C_21;
         int** C_22;
 
-        #pragma omp sections
         {
-            #pragma omp section
             {
                 A_11 = get_mem_parallel(size_half);
                 A_12 = get_mem_parallel(size_half);
@@ -988,7 +1227,6 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
                 A_22 = get_mem_parallel(size_half);
             }
 
-            #pragma omp section
             {
                 B_11 = get_mem_parallel(size_half);
                 B_12 = get_mem_parallel(size_half);
@@ -996,7 +1234,6 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
                 B_22 = get_mem_parallel(size_half);
             }
 
-            #pragma omp section
             {
                 C_11 = get_mem_parallel(size_half);
                 C_12 = get_mem_parallel(size_half);
@@ -1019,21 +1256,13 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
         int** P_6;
         int** P_7;
 
-        #pragma omp sections
         {
-            #pragma omp section
             P_1 = get_mem_parallel(size_half);
-            #pragma omp section
             P_2 = get_mem_parallel(size_half);
-            #pragma omp section
             P_3 = get_mem_parallel(size_half);
-            #pragma omp section
             P_4 = get_mem_parallel(size_half);
-            #pragma omp section
             P_5 = get_mem_parallel(size_half);
-            #pragma omp section
             P_6 = get_mem_parallel(size_half);
-            #pragma omp section
             P_7 = get_mem_parallel(size_half);
         }
 
@@ -1088,21 +1317,13 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
         del_mem_parallel(size_half, temp_1);
         del_mem_parallel(size_half, temp_2);
 
-        #pragma omp sections
         {
-            #pragma omp section
             del_mem_parallel(size_half, P_1);
-            #pragma omp section
             del_mem_parallel(size_half, P_2);
-            #pragma omp section
             del_mem_parallel(size_half, P_3);
-            #pragma omp section
             del_mem_parallel(size_half, P_4);
-            #pragma omp section
             del_mem_parallel(size_half, P_5);
-            #pragma omp section
             del_mem_parallel(size_half, P_6);
-            #pragma omp section
             del_mem_parallel(size_half, P_7);
         }
 
@@ -1110,9 +1331,7 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
 
 
 
-        #pragma omp sections
         {
-            #pragma omp section
             {
                 del_mem_parallel(size_half, A_11);
                 del_mem_parallel(size_half, A_12);
@@ -1120,7 +1339,6 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
                 del_mem_parallel(size_half, A_22);
             }
 
-            #pragma omp section
             {
                 del_mem_parallel(size_half, B_11);
                 del_mem_parallel(size_half, B_12);
@@ -1128,7 +1346,6 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
                 del_mem_parallel(size_half, B_22);
             }
 
-            #pragma omp section
             {
                 del_mem_parallel(size_half, C_11);
                 del_mem_parallel(size_half, C_12);
@@ -1136,63 +1353,5 @@ void mul_matrix_parallel(const int& size, int** A, int** B, int** C)
                 del_mem_parallel(size_half, C_22);
             }
         }
-    }   
-}
-
-void split_parallel(const int& size_half, int** A, int** A_11, int** A_12, int** A_21, int** A_22)
-{
-    int i, j;
-
-    #pragma omp parallel for collapse(2)
-    for (i = 0; i < size_half; i++)
-    {
-        for (j = 0; j < size_half; j++)
-        {
-            A_11[i][j] = A[i][j];
-            A_12[i][j] = A[i][j + size_half];
-            A_21[i][j] = A[i + size_half][j];
-            A_22[i][j] = A[i + size_half][j + size_half];
-        }
     }
-}
-
-void joint_parallel(const int& size_half, int** A, int** A_11, int** A_12, int** A_21, int** A_22)
-{
-    int i, j;
-
-    #pragma omp parallel for collapse(2)
-    for (i = 0; i < size_half; i++)
-    {
-        for (j = 0; j < size_half; j++)
-        {
-            A[i][j] = A_11[i][j];
-            A[i][j + size_half] = A_12[i][j];
-            A[i + size_half][j] = A_21[i][j];
-            A[i + size_half][j + size_half] = A_22[i][j];
-        }
-    }
-}
-
-int** get_mem_parallel(const int& size)
-{
-    int** A = new int*[size];
-    int i;
-
-    for (i = 0; i < size; i++)
-    {
-        A[i] = new int[size];
-    }
-
-    return A;
-}
-
-void del_mem_parallel(const int& size, int** A)
-{
-    int i;
-
-    for (i = 0; i < size; i++)
-    {
-        delete[] A[i];
-    }
-    delete[] A;
 }
