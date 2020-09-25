@@ -60,23 +60,23 @@ int main(int argc, char** argv, char** env)
     int size;
     double time_1, time_2;
 
-    // cout << "number of threads is in range [1, " << omp_get_max_threads() << "]" << endl << 
-    //     "let\'s use max number of threads" << endl <<
-    //     "stopwatch accuracy = " << fixed << setprecision(7) << omp_get_wtick() << " sec" << endl << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout << "number of threads is in range [1, " << omp_get_max_threads() << "]" << endl << 
+        "let\'s use max number of threads" << endl <<
+        "stopwatch accuracy = " << fixed << setprecision(7) << omp_get_wtick() << " sec" << endl << endl;
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
     omp_set_num_threads(omp_get_max_threads());
 
-    // get_matrix_size_from_cin(size);
+    get_matrix_size_from_cin(size);
 
-    {
-        size = atoi(argv[1]);   // for scripted research
-        cout << size << "\t";
-    }
+    // {
+    //     size = atoi(argv[1]);   // for scripted research
+    //     cout << size << "\t";
+    // }
 
 
-    // cout << endl << "ok, size = " << size << endl << endl;
+    cout << endl << "ok, size = " << size << endl << endl;
 
     int** A = new int*[size];
     for (i = 0; i < size; i++)
@@ -115,44 +115,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_1(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_1(size, A, B, C);
+    time_2 = omp_get_wtime();
 
     // cout << "\n\nresult:\n\n";
 
     // print_matrix(size, C);
 
-    // cout << "dumb algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
-    // // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
-
-
-
-
-
-
-
-
-
-
-    // reset_matrix(size, C);
-
-    // time_1 = omp_get_wtime();
-    // algorithm_2(size, A, B, C);
-    // time_2 = omp_get_wtime();
-
-    // // cout << "\n\nresult:\n\n";
-
-    // // print_matrix(size, C);
-
-    // // cout << "dumb parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    cout << "dumb algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
     // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -163,20 +139,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_3(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_2(size, A, B, C);
+    time_2 = omp_get_wtime();
 
-    // // cout << "\n\nresult:\n\n";
+    // cout << "\n\nresult:\n\n";
 
-    // // print_matrix(size, C);
+    // print_matrix(size, C);
 
-    // // cout << "reordered algorithm spent\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    cout << "dumb parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
     // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -187,20 +163,20 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_4(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_3(size, A, B, C);
+    time_2 = omp_get_wtime();
 
-    // // cout << "\n\nresult:\n\n";
+    // cout << "\n\nresult:\n\n";
 
-    // // print_matrix(size, C);
+    // print_matrix(size, C);
 
-    // // cout << "reordered parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    cout << "reordered algorithm spent\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
     // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -211,20 +187,44 @@ int main(int argc, char** argv, char** env)
 
 
 
-    // reset_matrix(size, C);
+    reset_matrix(size, C);
 
-    // time_1 = omp_get_wtime();
-    // algorithm_5(size, A, B, C);
-    // time_2 = omp_get_wtime();
+    time_1 = omp_get_wtime();
+    algorithm_4(size, A, B, C);
+    time_2 = omp_get_wtime();
+
+    // cout << "\n\nresult:\n\n";
+
+    // print_matrix(size, C);
+
+    cout << "reordered parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
+
+
+
+
+
+
+
+
+
+
+    reset_matrix(size, C);
+
+    time_1 = omp_get_wtime();
+    algorithm_5(size, A, B, C);
+    time_2 = omp_get_wtime();
     
-    // // cout << "\n\nresult:\n\n";
+    // cout << "\n\nresult:\n\n";
 
-    // // print_matrix(size, C);
+    // print_matrix(size, C);
 
-    // cout << "strassen algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
-    // // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
-    // cout.unsetf(ios::fixed | ios::scientific);
-    // cout.precision(6);
+    cout << "strassen algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
+    cout.unsetf(ios::fixed | ios::scientific);
+    cout.precision(6);
 
 
 
@@ -245,8 +245,8 @@ int main(int argc, char** argv, char** env)
 
     // print_matrix(size, C);
 
-    // cout << "strassen parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
-    cout << fixed << setprecision(7) << time_2 - time_1 << endl;
+    cout << "strassen parallel algorithm spent:\n" << fixed << setprecision(7) << time_2 - time_1 << " sec" << endl;
+    // cout << fixed << setprecision(7) << time_2 - time_1 << endl;
     cout.unsetf(ios::fixed | ios::scientific);
     cout.precision(6);
 
